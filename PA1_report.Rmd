@@ -1,0 +1,82 @@
+# Reproducible Research: Peer Assessment 1
+
+
+## Loading and preprocessing the data
+
+Extracting data from the compressed file and reading it to a data frame:
+
+```{r,  cache=TRUE}
+zipfile <- "activity.zip"
+flatdata <- unzip(zipfile, list = TRUE)[1]["Name"]
+data <- read.table(unz(zipfile, flatdata), header = TRUE, sep = ",")
+```
+
+Data description:
+
+```{r}
+str(data)
+summary(data)
+```
+
+## What is mean total number of steps taken per day?
+
+The data was aggregated by the column 'date' and a sum of steps in each day was calculated. 
+
+
+```{r}
+sum_steps_by_day <- aggregate(steps ~ date, data = data, sum)
+summary(sum_steps_by_day)
+```
+
+The resulting new data frame is pictured in the plot. Mean an dmedian values are shown as horizontal lines.
+
+```{r}
+mean_steps <- mean(sum_steps_by_day$steps)
+median_steps <- median(sum_steps_by_day$steps)
+
+plot(sum_steps_by_day$steps,
+     xlab = "Day",
+     ylab = "number of steps taken",
+     type="l",
+     lwd = 2)
+abline(h = mean_steps, col = "blue", lwd = 2)
+abline(h = median_steps, col = "green", lwd = 2, lty=2)
+legend("top", lty = c(1,2), bty = "n", col = c("blue", "green"), legend = c(paste("mean = ",round(mean_steps)), paste("median = ", median_steps)))
+```
+
+On the histogram below there are frequencies of the total number of steps taken each day. 
+
+```{r}
+
+
+hist(sum_steps_by_day$steps, 
+     breaks = seq(0,25000,by=2500),
+     main = "Histogram of the total number of steps taken each day", 
+     xlab = "Number of steps taken per day",
+     ylim = c(0,20),
+     col = "red")
+abline(v = mean_steps, col = "blue", lwd = 2)
+abline(v = median_steps, col = "green", lwd = 2, lty=2)
+legend("topright", lty = c(1,2), bty = "n", col = c("blue", "green"), legend = c(paste("mean = ",round(mean_steps)), paste("median = ", median_steps)))
+```
+
+
+## What is the average daily activity pattern?
+
+```{r}
+
+steps_by_interval <- aggregate(steps~interval, data=data, mean, na.rm=TRUE)
+max_steps <- max(steps_by_interval$steps)
+
+max_steps_interval <- steps_by_interval[steps_by_interval$steps == max_steps,][["interval"]]
+with(steps_by_interval, plot(steps~interval, type="l", ylim=c(0,250)))
+abline(v = max_steps_interval, col = "blue", lty = 2)
+text(max_steps_interval + 80, max_steps+20,paste("max steps interval =",max_steps_interval, "\nnumber of steps ~=", round(max_steps)))
+
+```
+
+## Imputing missing values
+
+
+
+## Are there differences in activity patterns between weekdays and weekends?
