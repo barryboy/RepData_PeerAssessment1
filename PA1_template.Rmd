@@ -67,7 +67,7 @@ median_steps <- median(sum_steps_by_day$steps)
 </li>
 <li>
 The total number of steps taken each day is shown in the histogram below. Each bar represents an interval of the length 1000. On the *y* axis the frequencies are measured in the number of days in which steps value falls into the given interval. The *mean* and *median* values are shown as vertical lines in the plot.
-```{r}
+```{r histogram_with_NA}
 hist(sum_steps_by_day$steps
      ,breaks = seq(0,25000,by=1000)
      ,main = "Histogram of the total number of steps taken each day"
@@ -97,7 +97,7 @@ max_steps_interval <- mean_steps_by_interval[mean_steps_by_interval$steps == max
 </li>
 <li>
 In the plot the average daily pattern is shown. On the *x* axis there are subsequent 5-minutes intervals,  the *y* axis represents the corresponding average number of steps. The interval with highiest value is marked with the vertical line.
-```{r}
+```{r steps_by_interval_timeseries}
 with(mean_steps_by_interval, plot(steps~interval
                                   ,type = "l"
                                   ,ylim = c(0,250)
@@ -143,7 +143,7 @@ filled_median_steps <- median(filled_sum_steps_by_day$steps)
 <li>
 The new data set is visualised in a histogram plot, showing the frequencies of given mean numbers of steps per day. Also the **mean** and **median** are included in the form of vertical lines.
 
-```{r}
+```{r histogram_with_filled_NA}
 hist(filled_sum_steps_by_day$steps, 
      breaks = seq(0,25000,by=1000),
      main = "Histogram of the total number of steps taken each day (filled NAs)", 
@@ -173,7 +173,7 @@ steps_by_interval_by_day <- aggregate(steps~interval+weekend, data=data, mean, n
 </li>
 <li>
 Importing the *'lattice'* package. Preparing panel plot containing a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
-```{r}
+```{r steps_by_interval_by_day_panel}
 library(lattice)
 xyplot(steps~interval|weekend
        ,data=steps_by_interval_by_day
