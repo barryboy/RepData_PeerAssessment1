@@ -95,7 +95,7 @@ abline(v = median_steps, col = "green", lwd = 2, lty=2)
 legend("topright", lty = c(1,2), bty = "n", col = c("blue", "green"), legend = c(paste("mean ~= ",round(mean_steps)), paste("median = ", median_steps)))
 ```
 
-![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8.png) 
+![plot of chunk histogram_with_NA](figure/histogram_with_NA.png) 
 </li>
 </ol>
 
@@ -130,7 +130,7 @@ abline(v = max_steps_interval, col = "blue", lty = 2)
 text(pos=4,max_steps_interval + 10, max_steps+20,paste("max steps interval =",max_steps_interval, "\nmean number of steps ~=", round(max_steps)))
 ```
 
-![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11.png) 
+![plot of chunk steps_by_interval_timeseries](figure/steps_by_interval_timeseries.png) 
 </li>
 </ol>
 
@@ -181,7 +181,7 @@ abline(v = filled_median_steps, col = "green", lwd = 2, lty=2)
 legend("topright", lty = c(1,2), bty = "n", col = c("blue", "green"), legend = c(paste("mean ~= ",round(filled_mean_steps)), paste("median = ", filled_median_steps)))
 ```
 
-![plot of chunk unnamed-chunk-15](figure/unnamed-chunk-15.png) 
+![plot of chunk histogram_with_filled_NA](figure/histogram_with_filled_NA.png) 
 
 There are almost no differences at all between this historam and the one from the first part of the report.
 </li>
@@ -216,7 +216,7 @@ xyplot(steps~interval|weekend
        ,ylab = "Number of steps")
 ```
 
-![plot of chunk unnamed-chunk-18](figure/unnamed-chunk-18.png) 
+![plot of chunk steps_by_interval_by_day_panel](figure/steps_by_interval_by_day_panel.png) 
 There are visible differences in the activity patterns between weekdays and weekends. While in both cases the highiest activity can be observed in the first part of the day, on weekends it stays high and on weekdays it drops significantly.
 </li>
 </ol>
