@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Reproducible Research: Peer Assessment 1</title>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>Reproducible Research: Peer Assessment 1</h1>
+
+<h2>Loading and preprocessing the data</h2>
+
+<ol>
+<li>
+Extracting data from the compressed file and reading it to a data frame:
+
+
+&ldquo;r
+zipfile <- "activity.zip"
+flatdata <- unzip(zipfile, list = TRUE)[1]["Name"]
+data <- read.table(unz(zipfile, flatdata), header = TRUE, sep = ",")
+```
+</li>
+
+<li>
+Excluding rows with undefined *&lsquo;date&rsquo;* or *&lsquo;interval&rsquo;*
+
+&rdquo;r
+data <- data[!is.na(data$date) & !is.na(data$interval),]
+```
+</li>
+
+<li>
+Converting date format from *&lsquo;factor&rsquo;* to  *&lsquo;date&rsquo;*
+
+&ldquo;r
+data$date <- as.Date(strptime(x = data$date,format = "%Y-%m-%d"))
+```
+</li>
+<li>
+Adding columns necassary for further analises:
+
+- **day_number** - numbering days from the beginning of the study
+
+- **missing** - logical value which assigns TRUE to the rows with missing *&lsquo;steps&rsquo;* value
+
+
+&rdquo;r
+data$day_number <- as.integer(data$date - data$date[1] + 1)
+data$missing <- is.na(data$steps)
+```
+</li>
+
+<li>
+Data types overview:
+
+
+&ldquo;r
+str(data)
+&rdquo;
+
+&ldquo;
+## &lsquo;data.frame&rsquo;:    17568 obs. of  5 variables:
+##  $ steps     : int  NA NA NA NA NA NA NA NA NA NA &hellip;
+##  $ date      : Date, format: &quot;2012-10-01&rdquo; &ldquo;2012-10-01&rdquo; &hellip;
+##  $ interval  : int  0 5 10 15 20 25 30 35 40 45 &hellip;
+##  $ day_number: int  1 1 1 1 1 1 1 1 1 1 &hellip;
+##  $ missing   : logi  TRUE TRUE TRUE TRUE TRUE TRUE &hellip;
+&ldquo;
+</li>
+</ol>
+
+<h2>What is mean total number of steps taken per day?</h2>
+
+<ol>
+<li>
+Creating new data frame *&lsquo;sum_steps_by_day&rsquo;* by aggregating the *&lsquo;data&rsquo;* data frame on the column *&lsquo;day_number&rsquo;*. For each day a sum of steps is calculted.
+
+&rdquo;r
+sum_steps_by_day <- aggregate(steps ~ as.factor(day_number), data = data, sum)
+```
+</li>
+<li>
+Calculating the **mean** and **median** of the number of steps per day:
+
+&ldquo;r
+mean_steps <- mean(sum_steps_by_day$steps)
+median_steps <- median(sum_steps_by_day$steps)
+```
+- **mean**: 1.0766 &times; 10<sup>4</sup>
+- **median**: 10765
+
+</li>
+<li>
+The total number of steps taken each day is shown in the histogram below. Each bar represents an interval of the length 1000. On the *y* axis the frequencies are measured in the number of days in which steps value falls into the given interval. The *mean* and *median* values are shown as vertical lines in the plot.
+
+&rdquo;r
+hist(sum_steps_by_day$steps
+     ,breaks = seq(0,25000,by=1000)
+     ,main = &ldquo;Histogram of the total number of steps taken each day&rdquo;
+     ,xlab = &ldquo;Number of steps taken per day&rdquo;
+     ,col = &ldquo;red&rdquo;)
+abline(v = mean_steps, col = &ldquo;blue&rdquo;, lwd = 2)
+abline(v = median_steps, col = &ldquo;green&rdquo;, lwd = 2, lty=2)
+legend(&ldquo;topright&rdquo;, lty = c(1,2), bty = &ldquo;n&rdquo;, col = c(&ldquo;blue&rdquo;, &ldquo;green&rdquo;), legend = c(paste(&ldquo;mean ~= &rdquo;,round(mean_steps)), paste(&ldquo;median = &rdquo;, median_steps)))
+&ldquo;
+
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8.png) 
+</li>
+</ol>
+
+<h2>What is the average daily activity pattern?</h2>
+
+<ol>
+<li>
+Creating new data frame *&lsquo;mean_steps_by_interval&rsquo;* by aggregating the *&lsquo;data&rsquo;* data frame on the column *&lsquo;interval&rsquo;*. For each time interval an average number of steps is calculted.
+
+&rdquo;r
+mean_steps_by_interval <- aggregate(steps~interval, data=data, mean, na.rm=TRUE)
+```
+</li>
+<li>
+Finding the interval with the highiest value of mean steps:
+
+&ldquo;r
+max_steps <- max(mean_steps_by_interval$steps)
+max_steps_interval <- mean_steps_by_interval[mean_steps_by_interval$steps == max_steps,][["interval"]]
+```
+</li>
+<li>
+In the plot the average daily pattern is shown. On the *x* axis there are subsequent 5-minutes intervals,  the *y* axis represents the corresponding average number of steps. The interval with highiest value is marked with the vertical line.
+
+&rdquo;r
+with(mean_steps_by_interval, plot(steps~interval
+                                  ,type = &ldquo;l&rdquo;
+                                  ,ylim = c(0,250)
+                                  ,xlim = c(0,2500)
+                                  )
+     )
+abline(v = max_steps_interval, col = &ldquo;blue&rdquo;, lty = 2)
+text(pos=4,max_steps_interval + 10, max_steps+20,paste(&ldquo;max steps interval =&rdquo;,max_steps_interval, &ldquo;\nmean number of steps ~=&rdquo;, round(max_steps)))
+&ldquo;
+
+![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11.png) 
+</li>
+</ol>
+
+<h2>Imputing missing values</h2>
+
+<ol>
+<li>
+Calculating the total number of missing values in the dataset (i.e. the total number of rows with NAs in the column &lsquo;steps&rsquo;):
+
+&rdquo;r
+n_missing <- sum(data$missing)
+```
+There are **2304** rows with missing values.
+</li>
+<li>
+The missing values have been substituted with mean values for a given 5-minute interval and the resulting data are saved in a new data frame ***&lsquo;filledData&rsquo;***
+
+&ldquo;r
+filledData <- data
+for (i in 1:nrow(filledData)){
+        if(is.na(filledData$steps[i])) {
+                current_interval <- filledData$interval[i]
+                filledData$steps[i] <- mean_steps_by_interval[mean_steps_by_interval$interval == current_interval,]$steps
+        }
+}
+```
+</li>
+<li>
+The new data set is aggregated to obtain new data frame with sums of steps in subsequent days. Also the **mean** and **median** are calculated:
+
+&rdquo;r
+filled_sum_steps_by_day <- aggregate(steps ~ date, data = filledData, sum)
+filled_mean_steps <- mean(filled_sum_steps_by_day$steps)
+filled_median_steps <- median(filled_sum_steps_by_day$steps)
+```
+</li>
+<li>
+The new data set is visualised in a histogram plot, showing the frequencies of given mean numbers of steps per day. Also the **mean** and **median** are included in the form of vertical lines.
+
+
+&ldquo;r
+hist(filled_sum_steps_by_day$steps, 
+     breaks = seq(0,25000,by=1000),
+     main = &quot;Histogram of the total number of steps taken each day (filled NAs)&rdquo;, 
+     xlab = &ldquo;Number of steps taken per day&rdquo;,
+     col = &ldquo;red&rdquo;)
+abline(v = filled_mean_steps, col = &ldquo;blue&rdquo;, lwd = 2)
+abline(v = filled_median_steps, col = &ldquo;green&rdquo;, lwd = 2, lty=2)
+legend(&ldquo;topright&rdquo;, lty = c(1,2), bty = &ldquo;n&rdquo;, col = c(&ldquo;blue&rdquo;, &ldquo;green&rdquo;), legend = c(paste(&ldquo;mean ~= &rdquo;,round(filled_mean_steps)), paste(&ldquo;median = &rdquo;, filled_median_steps)))
+&ldquo;
+
+![plot of chunk unnamed-chunk-15](figure/unnamed-chunk-15.png) 
+
+There are almost no differences at all between this historam and the one from the first part of the report.
+</li>
+</ol>
+
+<h2>Are there differences in activity patterns between weekdays and weekends?</h2>
+
+<ol>
+<li>
+Creating a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
+
+&rdquo;r
+data$weekend <- factor(as.numeric(as.POSIXlt(data$date)$wday)>5,labels = c(&ldquo;weekday&rdquo;,&ldquo;weekend&rdquo;))
+&ldquo;
+</li>
+<li>
+Aggregating the steps data by interval, separately for weekdays and for weekends
+
+&rdquo;r
+steps_by_interval_by_day <- aggregate(steps~interval+weekend, data=data, mean, na.rm = TRUE)
+```
+</li>
+<li>
+Importing the *&lsquo;lattice&rsquo;* package. Preparing panel plot containing a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
+
+&ldquo;r
+library(lattice)
+xyplot(steps~interval|weekend
+       ,data=steps_by_interval_by_day
+       ,type=&quot;l&rdquo;
+       ,layout = c(1,2)
+       ,xlab = &ldquo;Interval&rdquo;
+      
+       ,ylab = &ldquo;Number of steps&rdquo;)
+&ldquo;
+
+![plot of chunk unnamed-chunk-18](figure/unnamed-chunk-18.png) 
+There are visible differences in the activity patterns between weekdays and weekends. While in both cases the highiest activity can be observed in the first part of the day, on weekends it stays high and on weekdays it drops significantly.
+</li>
+</ol>
+
+</body>
+
+</html>
